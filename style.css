@@ -44,14 +44,14 @@
   transition: all linear 0.1s;
 }
 
+.key_darken {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
 .key_active {
   background-color: rgba(255, 255, 255, 0.8);
   border: 2px solid #ae0a0a;
   box-shadow: none;
-}
-
-.key_darken {
-  background-color: rgba(0, 0, 0, 0.3);
 }
 
 .key_wide {
@@ -63,15 +63,20 @@
 }
 
 @keyframes move-down {
-  from {
+  0% {
     border: 0px solid transparent;
     box-shadow: 5px 2px 2px #ae0a0a;
   }
 
-  to {
+  50% {
     border: 2px solid #ae0a0a;
     box-shadow: 0px 0px 0px #ae0a0a;
     background-color: rgba(255, 255, 255, 0.8);
+  }
+
+  100% {
+    border: 0px solid transparent;
+    box-shadow: 5px 2px 2px #ae0a0a;
   }
 }
 
