@@ -13,8 +13,8 @@
     '`', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 'Backspace',
     'Tab', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\\', 'Del',
     'CapsLock', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', "'", 'Enter',
-    'Shift', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/', '&#8657;', 'Shift',
-    'Ctrl', 'Win', 'Alt', '_____', 'Alt', '&#8656;', '&#8659;', '&#8658;', 'Ctrl'
+    'Shift', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/', '⇑', 'Shift',
+    'Ctrl', 'Win', 'Alt', '_____', 'Alt', '⇐', '⇓', '⇒', 'Ctrl'
   ];
   const keysRus = [
     'ё', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 'Backspace',
@@ -24,6 +24,7 @@
     'Ctrl', 'Win', 'Alt', '_____', 'Alt', '&#8656;', '&#8659;', '&#8658;', 'Ctrl'
   ];
     //TODO сделать выбор между языками в зависимости от языка, записанного в локал сторадж
+    //TODO записать состояния capslock в локал сторадж
   
   let titleBlock = document.createElement('h1');
   let keyBoard = document.createElement('div');
@@ -31,7 +32,7 @@
   let description = document.createElement('div');
 
   titleBlock.classList.add('title-block');
-  titleBlock.innerHTML = 'virtual keyboard';
+  titleBlock.innerText = 'virtual keyboard';
   textArea.classList.add('textarea-block');
   keyBoard.classList.add('keyboard-block');
   description.classList.add('description-block');
@@ -40,6 +41,12 @@
   body.prepend(keyBoard);
   body.prepend(textArea);
   body.prepend(titleBlock);
+
+  let inputTextarea = document.createElement('textarea');
+  inputTextarea.classList.add('text-area');
+  inputTextarea.placeholder = 'Welcome to the virtual keyboard. Enter the text';
+  inputTextarea.autofocus = true;
+  textArea.append(inputTextarea);
 
   function createKeys() {
     for (let i = 0; i < keysEng.length; i++) {
@@ -68,9 +75,19 @@
     let index = keysCode.indexOf(e);
     let activeKey = keys.find(key => key.innerText === keysEng[index]);
     keys.forEach(key => key.classList.remove('transition-down'));
-    activeKey.classList.add('transition-down');
-    activeKey.addEventListener('animationend', () => activeKey.classList.remove('transition-down'));
-    console.log(keysEng[index]);
+    console.log(activeKey.innerText);
+    if (activeKey.innerText === 'CapsLock') {
+      activeKey.classList.toggle('key_active');
+      activeKey.classList.contains('key_active') ? capsLock = true : capsLock = false;
+      //console.log(capsLock);
+    } else {
+      activeKey.classList.add('transition-down');
+      activeKey.addEventListener('animationend', () => activeKey.classList.remove('transition-down'));
+      //console.log(keysEng[index]);
+      //inputTextarea.value += keysEng[index];
+      console.log(inputTextarea.value);
+    }
+    
   };
 
   function lightingKeysByClick(elem) {
@@ -81,16 +98,24 @@
       console.log(capsLock);
     } else {
       elem.classList.add('transition-down');
-      console.log(elem.innerText);
+      //console.log(elem.innerText);
+      if (!capsLock) {
+        inputTextarea.value += elem.innerText;
+      } else {
+        inputTextarea.value += elem.innerText.toUpperCase();
+      }
+      //console.log(inputTextarea.value);
       elem.addEventListener('animationend', () => elem.classList.remove('transition-down'));
     }
     
   }
+  document.addEventListener('keydown', lightingKeysByTap);
+  keys.forEach(elem => elem.addEventListener('click', () => { lightingKeysByClick(elem) }));
 
   //TODO объединить индексы массивов ключей и букв и вывести букву на экран в поле инпут
+  //TODO удалить запись в текстареа содержимого функциональных кнопок
+  //TODO исправить: при нажатии на правые shift ctrl подсвечиваются левые
 
-  document.addEventListener('keydown', lightingKeysByTap);
-  keys.forEach(elem => elem.addEventListener('click', () => { lightingKeysByClick(elem) }))
 
   // function createCodeInd() {
   //   let arr = [];
