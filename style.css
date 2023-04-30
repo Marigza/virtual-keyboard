@@ -26,6 +26,12 @@
   height: 100%;
   border: 2px solid #ae0a0a;
   resize: none;
+  overflow-wrap: break-word;
+  overflow-y: scroll;
+}
+
+.description-block {
+  margin-top: 20px;
 }
 
 .keyboard-block {
