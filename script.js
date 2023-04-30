@@ -1,7 +1,5 @@
 {
   const body = document.querySelector('.body');
-  let capsLock = false;
-
   const keysCode = [
     'Backquote', 'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Digit0', 'Minus', 'Equal', 'Backspace',
     'Tab', 'KeyQ', 'KeyW', 'KeyE', 'KeyR', 'KeyT', 'KeyY', 'KeyU', 'KeyI', 'KeyO', 'KeyP', 'BracketLeft', 'BracketRight', 'Backslash', 'Delete',
@@ -20,12 +18,68 @@
     'ё', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 'Backspace',
     'Tab', 'й', 'ц', 'у', 'к', 'е', 'н', 'г', 'ш', 'щ', 'з', 'х', 'ъ', '\\', 'Del',
     'CapsLock', 'ф', 'ы', 'в', 'а', 'п', 'р', 'о', 'л', 'д', 'ж', 'э', 'Enter',
-    'Shift', 'я', 'ч', 'с', 'м', 'и', 'т', 'ь', 'б', 'ю', '.', '&#8657;', 'Shift',
-    'Ctrl', 'Win', 'Alt', '_____', 'Alt', '&#8656;', '&#8659;', '&#8658;', 'Ctrl'
+    'Shift', 'я', 'ч', 'с', 'м', 'и', 'т', 'ь', 'б', 'ю', '.', '⇑', 'Shift',
+    'Ctrl', 'Win', 'Alt', '_____', 'Alt', '⇐', '⇓', '⇒', 'Ctrl'
   ];
     //TODO сделать выбор между языками в зависимости от языка, записанного в локал сторадж
     //TODO записать состояния capslock в локал сторадж
   
+  let capsLock //= false;
+  let keysArr;
+
+  const languageTranslation = {
+    'eng': 'eng',
+    'rus': 'rus',
+  }
+
+  let lang = localStorage.getItem('lang') || languageTranslation.rus;
+  let keys;
+
+  document.addEventListener('keydown', function (event) {
+    if (event.shiftKey && event.altKey) {
+      alert('change lang');
+      lang === languageTranslation.eng ? lang = languageTranslation.rus : lang = languageTranslation.eng;
+      changeLang();
+      createKeys();
+      setLocalStorage();
+      getLocalStorage();
+    }
+  });
+
+  function changeLang() {
+    if (lang === languageTranslation.eng) {
+      keysArr = keysEng;
+      return keysArr;
+    } else if (lang === languageTranslation.rus) {
+      keysArr = keysRus;
+      return keysArr;
+    }
+  }
+  changeLang();
+
+  //local storage set/get
+
+  function setLocalStorage() {
+    localStorage.setItem('lang', lang);
+    localStorage.setItem('capsLock', capsLock);
+  }
+  window.addEventListener('beforeunload', setLocalStorage);
+
+  function getLocalStorage() {
+    if (localStorage.getItem('lang')) {
+      lang = localStorage.getItem('lang');
+      return lang;
+    }
+    if (localStorage.getItem('capsLock')) {
+      capsLock = localStorage.getItem('capsLock');
+      return capsLock;
+    }
+  }
+
+  window.addEventListener('load', getLocalStorage);
+
+  //rendering page
+
   let titleBlock = document.createElement('h1');
   let keyBoard = document.createElement('div');
   let textArea = document.createElement('div');
@@ -42,56 +96,83 @@
   body.prepend(textArea);
   body.prepend(titleBlock);
 
-  let inputTextarea = document.createElement('textarea');
+  let inputTextarea = document.createElement('div');
   inputTextarea.classList.add('text-area');
-  inputTextarea.placeholder = 'Welcome to the virtual keyboard. Enter the text';
-  inputTextarea.autofocus = true;
   textArea.append(inputTextarea);
 
+  let descrLang = document.createElement('div');
+  let descrHowChangeLang = document.createElement('div');
+  let descrOS = document.createElement('div');
+  //descrLang.innerText = `*текущий язык ${localStorage.getItem('lang') }`;
+  descrOS.innerText = 'Клавиатура создана в операционной системе Windows';
+  descrHowChangeLang.innerText = 'Для переключения языка комбинация: левыe shift + alt';
+
+  description.append(descrLang);
+  description.append(descrHowChangeLang);
+  description.append(descrOS);
+
   function createKeys() {
-    for (let i = 0; i < keysEng.length; i++) {
-      let key = `<div class="keyboard-key">${keysEng[i]}</div>`;
+    keyBoard.innerHTML = '';
+    for (let i = 0; i < keysArr.length; i++) {
+      let key = `<div class="keyboard-key">${keysArr[i]}</div>`;
       keyBoard.insertAdjacentHTML('beforeend', key);
     }
-    return keyBoard;
+    keys = Array.from(document.querySelectorAll('.keyboard-key'));
+    for (let i = 0; i < keys.length; i++) {
+      if (keys[i].innerText === 'Backspace' || keys[i].innerText === 'CapsLock' || keys[i].innerText === 'Enter' || keys[i].innerText === 'Shift') {
+        keys[i].classList.add('key_wide', 'key_darken');
+      }
+      if (keys[i].innerText === 'Del' || keys[i].innerText === 'Tab' || keys[i].innerText === 'Ctrl' || keys[i].innerText === 'Win' || keys[i].innerText === 'Alt' || keys[i].innerText === '⇑' || keys[i].innerText === '⇐' || keys[i].innerText === '⇒' || keys[i].innerText === '⇓') {
+        keys[i].classList.add('key_darken');
+      }
+      if (keys[i].innerText === '_____') {
+        keys[i].classList.add('key_extra-wide');
+      }
+    }
+    keys.forEach(elem => elem.addEventListener('click', () => { lightingKeysByClick(elem) }));
+    return keys;
   }
   createKeys()
 
-  let keys = Array.from(document.querySelectorAll('.keyboard-key'));
-  for (let i = 0; i < keys.length; i++) {
-    if (keys[i].innerText === 'Backspace' || keys[i].innerText === 'CapsLock' || keys[i].innerText === 'Enter' || keys[i].innerText === 'Shift') {
-      keys[i].classList.add('key_wide', 'key_darken');
-    }
-    if (keys[i].innerText === 'Del' || keys[i].innerText === 'Tab' || keys[i].innerText === 'Ctrl' || keys[i].innerText === 'Win' || keys[i].innerText === 'Alt' || keys[i].innerText === '⇑' || keys[i].innerText === '⇐' || keys[i].innerText === '⇒' || keys[i].innerText === '⇓') {
-      keys[i].classList.add('key_darken');
-    }
-    if (keys[i].innerText === '_____') {
-      keys[i].classList.add('key_extra-wide');
-    }
-  }
-  // console.log(keys);
+  //keys = Array.from(document.querySelectorAll('.keyboard-key'));
+
+  // for (let i = 0; i < keys.length; i++) {
+  //   if (keys[i].innerText === 'Backspace' || keys[i].innerText === 'CapsLock' || keys[i].innerText === 'Enter' || keys[i].innerText === 'Shift') {
+  //     keys[i].classList.add('key_wide', 'key_darken');
+  //   }
+  //   if (keys[i].innerText === 'Del' || keys[i].innerText === 'Tab' || keys[i].innerText === 'Ctrl' || keys[i].innerText === 'Win' || keys[i].innerText === 'Alt' || keys[i].innerText === '⇑' || keys[i].innerText === '⇐' || keys[i].innerText === '⇒' || keys[i].innerText === '⇓') {
+  //     keys[i].classList.add('key_darken');
+  //   }
+  //   if (keys[i].innerText === '_____') {
+  //     keys[i].classList.add('key_extra-wide');
+  //   }  
+  // }
+  //console.log(keys);
   function lightingKeysByTap(event) {
     let e = event.code;
     let index = keysCode.indexOf(e);
-    let activeKey = keys.find(key => key.innerText === keysEng[index]);
-    keys.forEach(key => key.classList.remove('transition-down'));
-    console.log(activeKey.innerText);
+    let activeKey = keys.find(key => key.innerText === keysArr[index]);
+    //keys.forEach(key => key.classList.remove('transition-down'));
+    //console.log(activeKey.innerText);
     if (activeKey.innerText === 'CapsLock') {
       activeKey.classList.toggle('key_active');
       activeKey.classList.contains('key_active') ? capsLock = true : capsLock = false;
       //console.log(capsLock);
     } else {
       activeKey.classList.add('transition-down');
-      activeKey.addEventListener('animationend', () => activeKey.classList.remove('transition-down'));
       //console.log(keysEng[index]);
-      //inputTextarea.value += keysEng[index];
-      console.log(inputTextarea.value);
+    if (!capsLock) {
+      inputTextarea.innerText += keysArr[index];
+    } else {
+      inputTextarea.innerText += keysArr[index].toUpperCase();
     }
-    
+    activeKey.addEventListener('animationend', () => activeKey.classList.remove('transition-down'));
+      //console.log(inputTextarea.value);
+    }
   };
 
   function lightingKeysByClick(elem) {
-    keys.forEach(elem => elem.classList.remove('transition-down'));
+    //keys.forEach(elem => elem.classList.remove('transition-down'));
     if (elem.innerText === 'CapsLock') {
       elem.classList.toggle('key_active');
       elem.classList.contains('key_active') ? capsLock = true : capsLock = false;
@@ -100,9 +181,9 @@
       elem.classList.add('transition-down');
       //console.log(elem.innerText);
       if (!capsLock) {
-        inputTextarea.value += elem.innerText;
+        inputTextarea.innerText += elem.innerText;
       } else {
-        inputTextarea.value += elem.innerText.toUpperCase();
+        inputTextarea.innerText += elem.innerText.toUpperCase();
       }
       //console.log(inputTextarea.value);
       elem.addEventListener('animationend', () => elem.classList.remove('transition-down'));
@@ -110,9 +191,10 @@
     
   }
   document.addEventListener('keydown', lightingKeysByTap);
-  keys.forEach(elem => elem.addEventListener('click', () => { lightingKeysByClick(elem) }));
+  //keys.forEach(elem => elem.addEventListener('click', () => { lightingKeysByClick(elem) }));
 
-  //TODO объединить индексы массивов ключей и букв и вывести букву на экран в поле инпут
+  //console.log(keys)
+
   //TODO удалить запись в текстареа содержимого функциональных кнопок
   //TODO исправить: при нажатии на правые shift ctrl подсвечиваются левые
 
