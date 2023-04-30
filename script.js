@@ -21,10 +21,9 @@
     'Shift', 'я', 'ч', 'с', 'м', 'и', 'т', 'ь', 'б', 'ю', '.', '⇑', 'Shift',
     'Ctrl', 'Win', 'Alt', '_____', 'Alt', '⇐', '⇓', '⇒', 'Ctrl'
   ];
-    //TODO сделать выбор между языками в зависимости от языка, записанного в локал сторадж
-    //TODO записать состояния capslock в локал сторадж
   
-  let capsLock //= false;
+  let capsLock = localStorage.getItem('capsLock') || false;
+
   let keysArr;
 
   const languageTranslation = {
@@ -37,12 +36,13 @@
 
   document.addEventListener('keydown', function (event) {
     if (event.shiftKey && event.altKey) {
-      alert('change lang');
+      // alert('change lang');
       lang === languageTranslation.eng ? lang = languageTranslation.rus : lang = languageTranslation.eng;
       changeLang();
-      createKeys();
       setLocalStorage();
+      createKeys();
       getLocalStorage();
+      capsLock = localStorage.getItem('capsLock') || false;
     }
   });
 
@@ -58,7 +58,7 @@
   changeLang();
 
   //local storage set/get
-
+ 
   function setLocalStorage() {
     localStorage.setItem('lang', lang);
     localStorage.setItem('capsLock', capsLock);
@@ -103,7 +103,6 @@
   let descrLang = document.createElement('div');
   let descrHowChangeLang = document.createElement('div');
   let descrOS = document.createElement('div');
-  //descrLang.innerText = `*текущий язык ${localStorage.getItem('lang') }`;
   descrOS.innerText = 'Клавиатура создана в операционной системе Windows';
   descrHowChangeLang.innerText = 'Для переключения языка комбинация: левыe shift + alt';
 
@@ -131,72 +130,60 @@
     }
     keys.forEach(elem => elem.addEventListener('click', () => { lightingKeysByClick(elem) }));
     return keys;
-  }
-  createKeys()
+  };
+  createKeys();
 
-  //keys = Array.from(document.querySelectorAll('.keyboard-key'));
-
-  // for (let i = 0; i < keys.length; i++) {
-  //   if (keys[i].innerText === 'Backspace' || keys[i].innerText === 'CapsLock' || keys[i].innerText === 'Enter' || keys[i].innerText === 'Shift') {
-  //     keys[i].classList.add('key_wide', 'key_darken');
-  //   }
-  //   if (keys[i].innerText === 'Del' || keys[i].innerText === 'Tab' || keys[i].innerText === 'Ctrl' || keys[i].innerText === 'Win' || keys[i].innerText === 'Alt' || keys[i].innerText === '⇑' || keys[i].innerText === '⇐' || keys[i].innerText === '⇒' || keys[i].innerText === '⇓') {
-  //     keys[i].classList.add('key_darken');
-  //   }
-  //   if (keys[i].innerText === '_____') {
-  //     keys[i].classList.add('key_extra-wide');
-  //   }  
-  // }
-  //console.log(keys);
   function lightingKeysByTap(event) {
     let e = event.code;
     let index = keysCode.indexOf(e);
     let activeKey = keys.find(key => key.innerText === keysArr[index]);
-    //keys.forEach(key => key.classList.remove('transition-down'));
-    //console.log(activeKey.innerText);
-    if (activeKey.innerText === 'CapsLock') {
-      activeKey.classList.toggle('key_active');
-      activeKey.classList.contains('key_active') ? capsLock = true : capsLock = false;
-      //console.log(capsLock);
-    } else {
-      activeKey.classList.add('transition-down');
-      //console.log(keysEng[index]);
-    if (!capsLock) {
-      inputTextarea.innerText += keysArr[index];
-    } else {
-      inputTextarea.innerText += keysArr[index].toUpperCase();
-    }
+    event.preventDefault();
+    switchingKeysBehavior(activeKey);
     activeKey.addEventListener('animationend', () => activeKey.classList.remove('transition-down'));
-      //console.log(inputTextarea.value);
-    }
   };
 
   function lightingKeysByClick(elem) {
-    //keys.forEach(elem => elem.classList.remove('transition-down'));
-    if (elem.innerText === 'CapsLock') {
-      elem.classList.toggle('key_active');
-      elem.classList.contains('key_active') ? capsLock = true : capsLock = false;
-      console.log(capsLock);
-    } else {
-      elem.classList.add('transition-down');
-      //console.log(elem.innerText);
-      if (!capsLock) {
-        inputTextarea.innerText += elem.innerText;
-      } else {
-        inputTextarea.innerText += elem.innerText.toUpperCase();
-      }
-      //console.log(inputTextarea.value);
-      elem.addEventListener('animationend', () => elem.classList.remove('transition-down'));
-    }
+    switchingKeysBehavior(elem);
+    elem.addEventListener('animationend', () => elem.classList.remove('transition-down'));
+  };
     
-  }
   document.addEventListener('keydown', lightingKeysByTap);
-  //keys.forEach(elem => elem.addEventListener('click', () => { lightingKeysByClick(elem) }));
 
-  //console.log(keys)
+  function switchingKeysBehavior(key) {
+    if (key.innerText === 'CapsLock') {
+      key.classList.toggle('key_active');
+      key.classList.contains('key_active') ? capsLock = true : capsLock = false;
+      console.log(capsLock);
+    } else if (key.innerText === 'Tab') {
+      key.classList.add('transition-down');
+      inputTextarea.innerText += '\u00A0' + '\u00A0' + '\u00A0' + '\u00A0';
+    } else if (key.innerText === 'Enter') {
+      key.classList.add('transition-down');
+      inputTextarea.innerText += '\n';
+    } else if (key.innerText === '_____') {
+      key.classList.add('transition-down');
+      inputTextarea.innerText += '\u00A0';
+    } else if (key.innerText === 'Backspace') {
+      key.classList.add('transition-down');
+      inputTextarea.innerText = inputTextarea.innerText.slice(0, inputTextarea.innerText.length - 1);
+    } else if (key.innerText === 'Del' || key.innerText === 'Ctrl' || key.innerText === 'Alt' || key.innerText === 'Win') {
+      key.classList.add('transition-down');
+    } else if (key.innerText === 'Shift') {
+      key.classList.add('transition-down');             // TODO: SHIFT BEHAVIOR
 
-  //TODO удалить запись в текстареа содержимого функциональных кнопок
+    }
+    else {
+      key.classList.add('transition-down');
+      if (capsLock === true) {
+        inputTextarea.innerText += key.innerText.toUpperCase();
+      } else {
+        inputTextarea.innerText += key.innerText;
+      }
+    }
+  }
+
   //TODO исправить: при нажатии на правые shift ctrl подсвечиваются левые
+  // TODO: SHIFT BEHAVIOR
 
 
   // function createCodeInd() {
