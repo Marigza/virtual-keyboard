@@ -81,7 +81,7 @@
   width: 45%;
 }
 
-@keyframes move-down {
+@keyframes move-down-up {
   0% {
     border: 0px solid transparent;
     box-shadow: 5px 2px 2px #ae0a0a;
@@ -99,26 +99,8 @@
   }
 }
 
-.transition-down {
-  animation-name: move-down;
-  animation-duration: 1s;
-}
-
-@keyframes move-up {
-  from {
-    border: 2px solid #ae0a0a;
-    box-shadow: 0px 0px 0px #ae0a0a;
-    background-color: rgba(255, 255, 255, 0.8);
-  }
-
-  to {
-    border: 0px solid transparent;
-    box-shadow: 5px 2px 2px #ae0a0a;
-  }
-}
-
-.transition-up {
-  animation-name: move-up;
+.transition-down-up {
+  animation-name: move-down-up;
   animation-duration: 1s;
 }
 
