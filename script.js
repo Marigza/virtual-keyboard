@@ -1,4 +1,5 @@
 {
+  alert ('Поведение кнопок при зажатом shift не реализовано')
   const body = document.querySelector('.body');
   const keysCode = [
     'Backquote', 'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Digit0', 'Minus', 'Equal', 'Backspace',
@@ -34,7 +35,7 @@
   let lang = localStorage.getItem('lang') || languageTranslation.rus;
   let keys;
 
-  document.addEventListener('keydown', function (event) {
+  document.addEventListener('keydown', (event) => {
     if (event.shiftKey && event.altKey) {
       lang === languageTranslation.eng ? lang = languageTranslation.rus : lang = languageTranslation.eng;
       changeLang();
@@ -42,7 +43,7 @@
       createKeys();
       getLocalStorage();
       capsLock = localStorage.getItem('capsLock') || false;
-    }
+    };
   });
 
   function changeLang() {
@@ -138,12 +139,12 @@
     let activeKey = keys[index];
     event.preventDefault();
     switchingKeysBehavior(activeKey);
-    activeKey.addEventListener('animationend', () => activeKey.classList.remove('transition-down'));
+    activeKey.addEventListener('animationend', () => activeKey.classList.remove('transition-down-up'));
   };
 
   function lightingKeysByClick(elem) {
     switchingKeysBehavior(elem);
-    elem.addEventListener('animationend', () => elem.classList.remove('transition-down'));
+    elem.addEventListener('animationend', () => elem.classList.remove('transition-down-up'));
   };
     
   document.addEventListener('keydown', lightingKeysByTap);
@@ -152,50 +153,31 @@
     if (key.innerText === 'CapsLock') {
       key.classList.toggle('key_active');
       key.classList.contains('key_active') ? capsLock = true : capsLock = false;
-      console.log(capsLock);
     } else if (key.innerText === 'Tab') {
-      key.classList.add('transition-down');
+      key.classList.add('transition-down-up');
       inputTextarea.innerText += '\u00A0' + '\u00A0' + '\u00A0' + '\u00A0';
     } else if (key.innerText === 'Enter') {
-      key.classList.add('transition-down');
+      key.classList.add('transition-down-up');
       inputTextarea.innerText += '\n';
     } else if (key.innerText === '_____') {
-      key.classList.add('transition-down');
+      key.classList.add('transition-down-up');
       inputTextarea.innerText += '\u00A0';
     } else if (key.innerText === 'Backspace') {
-      key.classList.add('transition-down');
+      key.classList.add('transition-down-up');
       inputTextarea.innerText = inputTextarea.innerText.slice(0, inputTextarea.innerText.length - 1);
-    } else if (key.innerText === 'Del' || key.innerText === 'Ctrl' || key.innerText === 'Alt' || key.innerText === 'Win') {
-      key.classList.add('transition-down');
-    } else if (key.innerText === 'Shift') {
-      key.classList.add('transition-down');             // TODO: SHIFT BEHAVIOR
-
-    }
-    else {
-      key.classList.add('transition-down');
+    } else if (key.innerText === 'Del' || key.innerText === 'Ctrl' || key.innerText === 'Alt' || key.innerText === 'Win' || key.innerText === 'Shift') {
+      key.classList.add('transition-down-up');
+    } else {
+      key.classList.add('transition-down-up');
       if (capsLock === true) {
         inputTextarea.innerText += key.innerText.toUpperCase();
       } else {
         inputTextarea.innerText += key.innerText;
       }
-    }
+    }   
   }
 
   // TODO: SHIFT BEHAVIOR
 
-
-  // function createCodeInd() {
-  //   let arr = [];
-  //   document.onkeydown = function (event) {
-  //     //console.log(event)
-  //     arr.push(event.code)
-  //     console.log(arr)
-  //   }
-  // } 
-  //  createCodeInd()
-  // let arr1 = ['Backquote', 'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Digit0', 'Minus', 'Equal', 'Backspace'];
-  // let arr2 = ['Tab', 'KeyQ', 'KeyW', 'KeyE', 'KeyR', 'KeyT', 'KeyY', 'KeyU', 'KeyI', 'KeyO', 'KeyP', 'BracketLeft', 'BracketRight', 'Backslash', 'Delete'];
-  // let arr3 = ['CapsLock', 'KeyA', 'KeyS', 'KeyD', 'KeyF', 'KeyG', 'KeyH', 'KeyJ', 'KeyK', 'KeyL', 'Semicolon', 'Quote', 'Enter'];
-  // let arr4 = ['ShiftLeft', 'KeyZ', 'KeyX', 'KeyC', 'KeyV', 'KeyB', 'KeyN', 'KeyM', 'Comma', 'Period', 'Slash', 'ArrowUp', 'ShiftRight'];
-  // let arr5 = ['ControlLeft', 'MetaLeft', 'AltLeft', 'Space', 'AltRight', 'ArrowLeft', 'ArrowDown', 'ArrowRight', 'ControlRight'];
+  
 }
